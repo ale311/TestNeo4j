@@ -35,7 +35,7 @@ public class JavaAPIExample{
 	private static final String DB_PATH = "util/neo4j-community-2.2.3/data/graph.db";
 
 	public enum MieRelazioni implements RelationshipType{
-		ASCOLTA, COMPONE, AMICO, VICINO, TAGGED;
+		ASCOLTA, COMPONE, AMICO, VICINO, TAGGED, VIVE;
 	}
 	public static void main(String[] args) throws IOException {
 		Date currentDate = new Date();
@@ -90,6 +90,19 @@ public class JavaAPIExample{
 			//			
 			//		}
 
+			parameters.clear();
+			//Accedo a LASTFM per estrarre nazionalità dell'utente
+			User user = User.getInfo(username, apiKey);
+			String uname = user.getName();
+			String country = user.getCountry();
+			queryString = "merge(u:Utente{Utente:{username}})"+
+						"merge(n:Nazione{Nazione:{Nazione}})"+
+						"merge(u)-[:VIVE_IN]-(n)";
+			parameters.put("username", username);
+			parameters.put("Nazione", country);
+			resultIterator = graphDb.execute(queryString, parameters).columnAs("utente vive in nazione");
+			//fine creazione nodi country
+			
 			parameters.clear();
 
 			//Accedo a lastfm per estrarre i max 200 ascolti dell'utente selezionato
